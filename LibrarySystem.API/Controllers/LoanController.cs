@@ -1,7 +1,6 @@
-﻿using LibrarySystem.API.Models;
-using LibrarySystem.API.Persistence;
+﻿using LibrarySystem.Application.Models;
+using LibrarySystem.Application.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LibrarySystem.API.Controllers
 {
@@ -9,93 +8,53 @@ namespace LibrarySystem.API.Controllers
     [ApiController]
     public class LoanController : ControllerBase
     {
-        private readonly LibrarySystemDbContext _context;
+        private readonly ILoanService _loanService;
 
-        public LoanController(LibrarySystemDbContext context)
+        public LoanController(ILoanService loanService)
         {
-            _context = context;
+            _loanService = loanService;
         }
 
         [HttpGet]
         public IActionResult GetAllLoans()
         {
-            var loans = _context.Loans
-                .Include(l => l.Book)
-                .Include(l => l.User)
-                .ToList();
+            var result = _loanService.GetAll();
 
-            var loanViewModel = loans.Select(LoanViewModel.FromEntity).ToList();
-
-            return Ok(loanViewModel);
+            return Ok(result);
         }
 
         [HttpPost]
         public IActionResult CreateLoan(CreateLoanInputModel loanModel)
         {
-            var loan = loanModel.ToEntity();
+            var result = _loanService.CreateLoan(loanModel);
 
-            _context.Loans.Add(loan);
-            _context.SaveChanges();
-
-            return Ok();
+            return Ok(result);
         }
 
         [HttpPut("{id}/set-return")]
         public IActionResult SetReturnDate(int id, DateTime returnDate)
         {
-            var loan = _context.Loans.SingleOrDefault(l => l.Id == id);
+            var result = _loanService.SetReturnDate(id, returnDate);
 
-            if (loan is null)
-                return NotFound("Empréstimo não encontrado.");
+            if(!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
 
-            loan.SetReturnDate(returnDate);
-            _context.SaveChanges();
-
-            return Ok();
+            return Ok(result);
         }
 
         [HttpPut("{id}/returnBook")]
-        public IActionResult ReturnBook(int id, DateTime? returned)
+        public IActionResult ReturnBook(int id, DateTime returned)
         {
-            var returnBook = _context.Loans
-                .Include(l => l.Book)
-                .Include(l => l.User)
-                .SingleOrDefault(r => r.Id == id);
+            var result = _loanService.ReturnBook(id, returned);
 
-            if (returnBook is null)
+            if (!result.IsSuccess)
             {
-                return NotFound("Empréstimo não encontrado.");
+                return BadRequest(result.Message);
             }
 
-            if (returnBook.ReturnedAt.HasValue)
-            {
-                return BadRequest("Livro já foi devolvido.");
-            }
-
-            var returnDate = returned ?? DateTime.Now;
-
-            returnBook.MarkAsReturned(returnDate);
-            _context.SaveChanges();
-
-            var atraso = (returnDate - returnBook.ReturnFromLoan).Days;
-
-            if (atraso > 0)
-            {
-
-                return Ok(new
-                {
-                    message = $"Livro devolvido com {atraso} dias de atraso.",
-                    dataDevolucao = returnDate.ToShortDateString()
-                });
-            }
-            else
-            {
-                return Ok(new
-                {
-                    message = "Livro devolvido dentro do prazo.",
-                    dataDevolucao = returnDate.ToShortDateString()
-                });
-            }
+            return Ok(result);
         }
     }
 }

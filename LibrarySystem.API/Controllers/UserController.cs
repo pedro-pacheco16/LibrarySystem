@@ -1,8 +1,6 @@
-﻿using LibrarySystem.API.Entities;
-using LibrarySystem.API.Models;
-using LibrarySystem.API.Persistence;
+﻿using LibrarySystem.Application.Models;
+using LibrarySystem.Application.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LibrarySystem.API.Controllers
 {
@@ -10,34 +8,27 @@ namespace LibrarySystem.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private readonly IUserService _userService;
 
-        private readonly LibrarySystemDbContext _context;
-
-        public UserController(LibrarySystemDbContext context)
+        public UserController(IUserService userService)
         {
-            _context = context;
+            _userService = userService;
         }
 
         [HttpGet]
         public IActionResult GetAll()
         {
-            var users = _context.Users.ToList();
+            var result = _userService.GetAll();
 
-            var model = users.Select(user => new UserViewModel(user.Name, user.Email)).ToList();
-
-            return Ok(model);
+            return Ok(result);
         }
 
         [HttpPost]
         public IActionResult CreateUser(CreateUserInputModel userModel)
         {
-            var user = new User(userModel.Name, userModel.Email);
+            var result = _userService.CreateUser(userModel);
 
-
-            _context.Users.Add(user);
-            _context.SaveChanges();
-
-            return Ok();
+            return Ok(result);
         }
     }
 }

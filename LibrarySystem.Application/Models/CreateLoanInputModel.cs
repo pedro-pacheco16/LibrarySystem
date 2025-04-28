@@ -1,6 +1,6 @@
-﻿using LibrarySystem.API.Entities;
+﻿using LibrarySystem.Core.Entities;
 
-namespace LibrarySystem.API.Models
+namespace LibrarySystem.Application.Models
 {
     public class CreateLoanInputModel
     {
@@ -8,7 +8,7 @@ namespace LibrarySystem.API.Models
 
         public int IdBook { get; set; }
 
-        public DateTime LoanBook {  get; set; }
+        public DateTime LoanBook { get; set; }
 
         public Loan ToEntity()
             => new(IdUser, IdBook);

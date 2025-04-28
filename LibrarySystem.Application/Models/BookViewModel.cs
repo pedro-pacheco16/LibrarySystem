@@ -1,7 +1,7 @@
-﻿using LibrarySystem.API.Entities;
-using LibrarySystem.API.Enums;
+﻿using LibrarySystem.Core.Entities;
+using LibrarySystem.Core.Enums;
 
-namespace LibrarySystem.API.Models
+namespace LibrarySystem.Application.Models
 {
     public class BookViewModel
     {

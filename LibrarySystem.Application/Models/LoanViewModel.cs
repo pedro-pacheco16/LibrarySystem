@@ -1,6 +1,6 @@
-﻿using LibrarySystem.API.Entities;
+﻿using LibrarySystem.Core.Entities;
 
-namespace LibrarySystem.API.Models
+namespace LibrarySystem.Application.Models
 {
     public class LoanViewModel
     {
@@ -8,7 +8,7 @@ namespace LibrarySystem.API.Models
         {
             Title = title;
             UserName = userName;
-            LoanDate = loanDate; 
+            LoanDate = loanDate;
             ReturnFromLoan = returnFromLoan;
         }
 

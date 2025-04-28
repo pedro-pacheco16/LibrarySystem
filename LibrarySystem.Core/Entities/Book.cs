@@ -1,7 +1,6 @@
-﻿using LibrarySystem.API.Enums;
-using Microsoft.AspNetCore.Http.Connections;
+﻿using LibrarySystem.Core.Enums;
 
-namespace LibrarySystem.API.Entities
+namespace LibrarySystem.Core.Entities
 {
     public class Book : BaseEntity
     {
@@ -35,12 +34,12 @@ namespace LibrarySystem.API.Entities
 
         public void Unavailable()
         {
-                Status = BookStatusEnum.unavailable;
+            Status = BookStatusEnum.unavailable;
         }
 
         public void Loan()
-        {            
-                Status = BookStatusEnum.Loan;
+        {
+            Status = BookStatusEnum.Loan;
         }
 
         public void Reserved()

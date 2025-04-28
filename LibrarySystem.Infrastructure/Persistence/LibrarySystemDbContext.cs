@@ -1,8 +1,7 @@
-﻿using LibrarySystem.API.Entities;
+﻿using LibrarySystem.Core.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
-namespace LibrarySystem.API.Persistence
+namespace LibrarySystem.Infrastructure.Persistence
 {
     public class LibrarySystemDbContext : DbContext
     {
@@ -32,7 +31,7 @@ namespace LibrarySystem.API.Persistence
                 .Entity<Loan>(e =>
                 {
                     e.HasKey(l => l.Id);
-                      
+
                     e.HasOne(l => l.User)
                      .WithMany(u => u.Loans)
                      .HasForeignKey(u => u.IdUser)

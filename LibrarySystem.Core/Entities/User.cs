@@ -1,4 +1,4 @@
-﻿namespace LibrarySystem.API.Entities
+﻿namespace LibrarySystem.Core.Entities
 {
     public class User : BaseEntity
     {

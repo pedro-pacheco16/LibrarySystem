@@ -1,4 +1,4 @@
-﻿namespace LibrarySystem.API.Entities
+﻿namespace LibrarySystem.Core.Entities
 {
     public class Loan : BaseEntity
     {
@@ -24,14 +24,14 @@
 
         public Book Book { get; private set; }
 
-        public void SetReturnDate (DateTime returnFromLoan)
+        public void SetReturnDate(DateTime returnFromLoan)
         {
             ReturnFromLoan = returnFromLoan;
         }
 
         public void MarkAsReturned(DateTime returnAt)
         {
-            ReturnedAt = DateTime.Now;
+            ReturnedAt = returnAt;
         }
     }
 }

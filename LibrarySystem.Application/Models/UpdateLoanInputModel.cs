@@ -1,4 +1,4 @@
-﻿namespace LibrarySystem.API.Models
+﻿namespace LibrarySystem.Application.Models
 {
     public class UpdateLoanInputModel
     {

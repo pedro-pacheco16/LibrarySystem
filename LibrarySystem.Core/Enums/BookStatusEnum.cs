@@ -1,6 +1,4 @@
-﻿using LibrarySystem.API.Entities;
-
-namespace LibrarySystem.API.Enums
+﻿namespace LibrarySystem.Core.Enums
 {
     public enum BookStatusEnum
     {
