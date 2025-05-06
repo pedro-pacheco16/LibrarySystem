@@ -52,6 +52,7 @@ namespace LibrarySystem.Infrastructure.Persistence
                      .WithOne(l => l.User)
                      .HasForeignKey(l => l.IdUser);
                 });
+            base.OnModelCreating(builder);
         }
     }
 }

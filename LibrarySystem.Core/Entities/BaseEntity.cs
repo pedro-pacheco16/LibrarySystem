@@ -9,5 +9,12 @@
         }
 
         public int Id { get; private set; }
+
+        public bool IsDeleted { get; private set; }
+
+        public void setAsDeleted()
+        {
+            IsDeleted = true;
+        }
     }
 }

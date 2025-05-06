@@ -26,6 +26,8 @@ namespace LibrarySystem.Application.Models
 
         public BookStatusEnum Status { get; private set; }
 
+        public string StatusName => Status.ToString();
+
         public static BookViewModel FromEntity(Book entity)
             => new BookViewModel(entity.Id, entity.Title, entity.Author, entity.Isbn, entity.Publication, entity.Status);
     }

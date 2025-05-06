@@ -2,6 +2,7 @@ using LibrarySystem.API.ExceptionHandler;
 using LibrarySystem.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using LibrarySystem.Application;
+using LibrarySystem.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,9 @@ var connectionString = builder.Configuration.GetConnectionString("LibrarySystemC
 
 builder.Services.AddDbContext<LibrarySystemDbContext>(o => o.UseSqlServer(connectionString));
 
-builder.Services.AddApplication();
+builder.Services
+    .AddApplication()
+    .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 builder.Services.AddProblemDetails();

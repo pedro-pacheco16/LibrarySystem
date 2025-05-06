@@ -1,5 +1,8 @@
-﻿using LibrarySystem.Application.Models;
-using LibrarySystem.Application.Services;
+﻿using LibrarySystem.Application.Command.CreateLoan;
+using LibrarySystem.Application.Command.ReturnBook;
+using LibrarySystem.Application.Command.SetReturnDateBook;
+using LibrarySystem.Application.Query.GetAllLoan;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibrarySystem.API.Controllers
@@ -8,35 +11,38 @@ namespace LibrarySystem.API.Controllers
     [ApiController]
     public class LoanController : ControllerBase
     {
-        private readonly ILoanService _loanService;
-
-        public LoanController(ILoanService loanService)
+         private readonly IMediator _mediator;
+        public LoanController(IMediator mediator)
         {
-            _loanService = loanService;
+            _mediator = mediator;
         }
 
         [HttpGet]
-        public IActionResult GetAllLoans()
+        public async Task<IActionResult> GetAllLoans()
         {
-            var result = _loanService.GetAll();
+            var result = await _mediator.Send(new GetAllLoanQuery());
 
             return Ok(result);
         }
 
         [HttpPost]
-        public IActionResult CreateLoan(CreateLoanInputModel loanModel)
+        public async Task<IActionResult> CreateLoan(CreateLoanCommand command)
         {
-            var result = _loanService.CreateLoan(loanModel);
+            var result = await _mediator.Send(command);
 
+            if (!result.IsSuccess)
+            {
+                return BadRequest(result.Message);
+            }
             return Ok(result);
         }
 
         [HttpPut("{id}/set-return")]
-        public IActionResult SetReturnDate(int id, DateTime returnDate)
+        public async Task<IActionResult> SetReturnDate(int id, DateTime returnDate)
         {
-            var result = _loanService.SetReturnDate(id, returnDate);
+            var result = await _mediator.Send(new SetReturnDateBookCommand(id, returnDate));
 
-            if(!result.IsSuccess)
+            if (!result.IsSuccess)
             {
                 return BadRequest(result.Message);
             }
@@ -45,9 +51,9 @@ namespace LibrarySystem.API.Controllers
         }
 
         [HttpPut("{id}/returnBook")]
-        public IActionResult ReturnBook(int id, DateTime returned)
+        public async Task<IActionResult> ReturnBook(int id, DateTime returned)
         {
-            var result = _loanService.ReturnBook(id, returned);
+            var result = await _mediator.Send(new ReturnBookCommand(id, returned));
 
             if (!result.IsSuccess)
             {

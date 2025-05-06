@@ -1,4 +1,5 @@
-﻿using LibrarySystem.Application.Services;
+﻿using LibrarySystem.Application.Command.CreateBook;
+using LibrarySystem.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LibrarySystem.Application
@@ -8,7 +9,8 @@ namespace LibrarySystem.Application
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services
-                .AddServices();
+                .AddServices()
+                .AddHandlers();
 
             return services;
         }
@@ -18,6 +20,13 @@ namespace LibrarySystem.Application
             services.AddScoped<IBookService, BookService>();
             services.AddScoped<ILoanService, LoanService>();
             services.AddScoped<IUserService, UserService>();
+
+            return services;
+        }
+        private static IServiceCollection AddHandlers(this IServiceCollection services)
+        {
+            services.AddMediatR(config =>
+            config.RegisterServicesFromAssemblyContaining<CreateBookCommand>());
 
             return services;
         }

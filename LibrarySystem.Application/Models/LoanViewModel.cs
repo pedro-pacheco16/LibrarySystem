@@ -4,13 +4,15 @@ namespace LibrarySystem.Application.Models
 {
     public class LoanViewModel
     {
-        public LoanViewModel(string title, string userName, DateTime loanDate, DateTime returnFromLoan)
+        public LoanViewModel(int idLoan,string title, string userName, DateTime loanDate, DateTime returnFromLoan)
         {
+            IdLoan = idLoan;
             Title = title;
             UserName = userName;
             LoanDate = loanDate;
             ReturnFromLoan = returnFromLoan;
         }
+        public int IdLoan { get; private set; }
 
         public string Title { get; private set; }
 
@@ -21,6 +23,6 @@ namespace LibrarySystem.Application.Models
         public DateTime ReturnFromLoan { get; private set; }
 
         public static LoanViewModel FromEntity(Loan entity)
-            => new LoanViewModel(entity.Book.Title, entity.User.Name, entity.LoanDate, entity.ReturnFromLoan);
+            => new LoanViewModel(entity.Id, entity.Book.Title, entity.User.Name, entity.LoanDate, entity.ReturnFromLoan);
     }
 }

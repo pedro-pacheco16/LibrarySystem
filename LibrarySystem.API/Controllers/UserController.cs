@@ -1,5 +1,7 @@
-﻿using LibrarySystem.Application.Models;
+﻿using LibrarySystem.Application.Command.CreateUser;
+using LibrarySystem.Application.Query.GetAllUser;
 using LibrarySystem.Application.Services;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibrarySystem.API.Controllers
@@ -9,24 +11,26 @@ namespace LibrarySystem.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IMediator _mediator;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IMediator mediator)
         {
             _userService = userService;
+            _mediator = mediator;
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var result = _userService.GetAll();
+            var result = await _mediator.Send(new GetAllUserQuery());
 
             return Ok(result);
         }
 
         [HttpPost]
-        public IActionResult CreateUser(CreateUserInputModel userModel)
+        public async Task<IActionResult> CreateUser(CreateUserCommand command)
         {
-            var result = _userService.CreateUser(userModel);
+            var result = await _mediator.Send(command);
 
             return Ok(result);
         }
