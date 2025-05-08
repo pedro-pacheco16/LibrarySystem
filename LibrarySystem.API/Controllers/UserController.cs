@@ -1,6 +1,5 @@
 ﻿using LibrarySystem.Application.Command.CreateUser;
 using LibrarySystem.Application.Query.GetAllUser;
-using LibrarySystem.Application.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,12 +9,10 @@ namespace LibrarySystem.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
         private readonly IMediator _mediator;
 
-        public UserController(IUserService userService, IMediator mediator)
+        public UserController(IMediator mediator)
         {
-            _userService = userService;
             _mediator = mediator;
         }
 

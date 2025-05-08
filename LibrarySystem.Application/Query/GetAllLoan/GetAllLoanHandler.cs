@@ -1,24 +1,19 @@
 ﻿using LibrarySystem.Application.Models;
 using LibrarySystem.Application.Query.GetAllLoan;
-using LibrarySystem.Infrastructure.Persistence;
+using LibrarySystem.Core.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 public class GetAllLoanHandler : IRequestHandler<GetAllLoanQuery, ResultViewModel<List<LoanViewModel>>>
 {
-    private readonly LibrarySystemDbContext _context;
+    private readonly ILoanRepository _repository;
 
-    public GetAllLoanHandler(LibrarySystemDbContext context)
+    public GetAllLoanHandler(ILoanRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
     public async Task<ResultViewModel<List<LoanViewModel>>> Handle(GetAllLoanQuery request, CancellationToken cancellationToken)
     {
-        var loans = await _context.Loans
-               .Where(l => l.ReturnedAt == null)
-               .Include(l => l.Book)
-               .Include(l => l.User)
-               .ToListAsync();
+        var loans = await _repository.GetAllLoan();
 
         var loanViewModel = loans.Select(LoanViewModel.FromEntity).ToList();
 

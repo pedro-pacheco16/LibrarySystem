@@ -1,37 +1,35 @@
 ﻿using LibrarySystem.Application.Command.CreateLoan;
 using LibrarySystem.Application.Models;
-using LibrarySystem.Infrastructure.Persistence;
+using LibrarySystem.Core.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 public class CreateLoanHandler : IRequestHandler<CreateLoanCommand, ResultViewModel<int>>
 {
-    private readonly LibrarySystemDbContext _context;
+    private readonly ILoanRepository _repository;
 
-    public CreateLoanHandler(LibrarySystemDbContext context)
+    public CreateLoanHandler(ILoanRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
+
     public async Task<ResultViewModel<int>> Handle(CreateLoanCommand request, CancellationToken cancellationToken)
     {
-        var loanExists = await _context.Loans.AnyAsync(l => l.IdBook == request.IdBook && l.ReturnedAt == null);
+        var loanExists = await _repository.LoanExists(request.IdBook);
 
-        if(loanExists)
+        if (loanExists)
         {
             return ResultViewModel<int>.Error("Livro Indisponível no momento");
         }
         var loan = request.ToEntity();
 
-        var book = await _context.Books.SingleOrDefaultAsync(b => b.Id == request.IdBook && !b.IsDeleted);
+        var book = await _repository.GetAvailableBookAsync(request.IdBook);
 
-        if(book is null)
+        if (book is null)
         {
             return ResultViewModel<int>.Error("Livro não encontrado");
         }
-        book.Loan();
-        await _context.Loans.AddAsync(loan);
-        _context.Books.Update(book);
-        await _context.SaveChangesAsync();
+
+        await _repository.CreateLoan(loan,book);
 
         return ResultViewModel<int>.Success(loan.Id);
     }

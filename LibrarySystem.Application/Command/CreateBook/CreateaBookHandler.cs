@@ -1,24 +1,24 @@
 ﻿using LibrarySystem.Application.Models;
-using LibrarySystem.Infrastructure.Persistence;
+using LibrarySystem.Core.Repositories;
 using MediatR;
 
 namespace LibrarySystem.Application.Command.CreateBook
 {
     public class CreateaBookHandler : IRequestHandler<CreateBookCommand, ResultViewModel<int>>
     {
-        private readonly LibrarySystemDbContext _context;
+        private readonly IBookRepository _repository;
 
-        public CreateaBookHandler(LibrarySystemDbContext context)
+        public CreateaBookHandler(IBookRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
+
         public async Task<ResultViewModel<int>> Handle(CreateBookCommand request, CancellationToken cancellationToken)
         {
             var book = request.ToEntity();
 
-            await _context.Books.AddAsync(book);
-            await _context.SaveChangesAsync();
-
+            await _repository.CreateBook(book);
+           
             return ResultViewModel<int>.Success(book.Id);
         }
     }

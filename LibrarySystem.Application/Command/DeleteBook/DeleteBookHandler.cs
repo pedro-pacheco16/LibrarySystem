@@ -1,20 +1,19 @@
 ﻿using LibrarySystem.Application.Command.DeleteBook;
 using LibrarySystem.Application.Models;
-using LibrarySystem.Infrastructure.Persistence;
+using LibrarySystem.Core.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 public class DeleteBookHandler : IRequestHandler<DeleteBookCommand, ResultViewModel>
 {
-    private readonly LibrarySystemDbContext _context;
+    private readonly IBookRepository _repository;
 
-    public DeleteBookHandler(LibrarySystemDbContext context)
+    public DeleteBookHandler(IBookRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
     public async Task<ResultViewModel> Handle(DeleteBookCommand request, CancellationToken cancellationToken)
     {
-        var book = await _context.Books.SingleOrDefaultAsync(b => b.Id == request.Id);
+        var book = await _repository.GetById(request.Id);
 
         if (book is null)
         {
@@ -22,8 +21,7 @@ public class DeleteBookHandler : IRequestHandler<DeleteBookCommand, ResultViewMo
         }
 
         book.setAsDeleted();
-        _context.Books.Update(book);
-        await _context.SaveChangesAsync();
+        await _repository.UpdateBook(book);
 
         return ResultViewModel.Success();
     }

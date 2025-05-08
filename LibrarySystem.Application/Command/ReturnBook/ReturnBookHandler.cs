@@ -1,26 +1,22 @@
 ﻿using LibrarySystem.Application.Command.ReturnBook;
 using LibrarySystem.Application.Models;
 using LibrarySystem.Application.Notification.ReturnedBook;
-using LibrarySystem.Infrastructure.Persistence;
+using LibrarySystem.Core.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 public class ReturnBookHandler : IRequestHandler<ReturnBookCommand, ResultViewModel>
 {
-    private readonly LibrarySystemDbContext _context;
+    private readonly ILoanRepository _repository;
     private readonly IMediator _mediator;
 
-    public ReturnBookHandler(LibrarySystemDbContext context, IMediator mediator)
+    public ReturnBookHandler(ILoanRepository repository, IMediator mediator)
     {
-        _context = context;
+        _repository = repository;
         _mediator = mediator;
     }
     public async Task<ResultViewModel> Handle(ReturnBookCommand request, CancellationToken cancellationToken)
     {
-        var returnBook =await _context.Loans
-                .Include(l => l.Book)
-                .Include(l => l.User)
-                .SingleOrDefaultAsync(r => r.Id == request.Id);
+        var returnBook = await _repository.GetLoanById(request.Id);
 
         if (returnBook is null)
         {
@@ -32,11 +28,9 @@ public class ReturnBookHandler : IRequestHandler<ReturnBookCommand, ResultViewMo
             return ResultViewModel.Error("Livro já foi devolvido.");
         }
 
-        returnBook.MarkAsReturned(request.Returned);
-        returnBook.Book.Available();
-        await _context.SaveChangesAsync();
+        await _repository.ReturnBook(request.Id, request.Returned);
 
-        var atraso = (request.Returned - returnBook.ReturnFromLoan).Days;
+        var atraso = (request.Returned.Date - returnBook.ReturnFromLoan.Date).Days;
 
         await _mediator.Publish(new ReturnedBookNotification(
             email: returnBook.User.Email,

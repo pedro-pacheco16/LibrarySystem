@@ -1,23 +1,20 @@
-﻿using Azure.Core;
-using LibrarySystem.Application.Models;
+﻿using LibrarySystem.Application.Models;
 using LibrarySystem.Application.Query.GetByIdBook;
-using LibrarySystem.Infrastructure.Persistence;
+using LibrarySystem.Core.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+
 
 public class GetByIdBookHandler : IRequestHandler<GetByIdBookQuery, ResultViewModel<BookViewModel>>
 {
-    private readonly LibrarySystemDbContext _context;
+    private readonly IBookRepository _repository;
 
-    public GetByIdBookHandler(LibrarySystemDbContext context)
+    public GetByIdBookHandler(IBookRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
     public async Task<ResultViewModel<BookViewModel>> Handle(GetByIdBookQuery request, CancellationToken cancellationToken)
     {
-        var books = await _context.Books
-               .Include(l => l.LoanList)
-               .SingleOrDefaultAsync(b => b.Id == request.Id);
+        var books = await _repository.GetById(request.Id);
 
         if (books is null)
         {

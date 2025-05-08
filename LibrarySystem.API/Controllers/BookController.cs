@@ -3,7 +3,6 @@ using LibrarySystem.Application.Command.DeleteBook;
 using LibrarySystem.Application.Command.UpdateBook;
 using LibrarySystem.Application.Query.GetAllBook;
 using LibrarySystem.Application.Query.GetByIdBook;
-using LibrarySystem.Application.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,21 +1,20 @@
 ﻿using LibrarySystem.Application.Command.UpdateBook;
 using LibrarySystem.Application.Models;
-using LibrarySystem.Infrastructure.Persistence;
+using LibrarySystem.Core.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 public class UpdateBookHandler : IRequestHandler<UpdateBookCommand, ResultViewModel>
 {
-    private readonly LibrarySystemDbContext _context;
+    private readonly IBookRepository _repository;
 
-    public UpdateBookHandler(LibrarySystemDbContext context)
+    public UpdateBookHandler(IBookRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
     public async Task<ResultViewModel> Handle(UpdateBookCommand request, CancellationToken cancellationToken)
     {
 
-        var book = await _context.Books.SingleOrDefaultAsync(b => b.Id == request.IdBook);
+        var book = await _repository.GetById(request.IdBook);
 
         if (book is null)
         {
@@ -24,8 +23,7 @@ public class UpdateBookHandler : IRequestHandler<UpdateBookCommand, ResultViewMo
 
         book.Update(request.Title, request.Author, request.Isbn, request.Publication);
 
-        _context.Books.Update(book);
-        await _context.SaveChangesAsync();
+        await _repository.UpdateBook(book);
 
         return ResultViewModel.Success();
     }

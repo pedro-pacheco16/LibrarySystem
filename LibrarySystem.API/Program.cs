@@ -1,6 +1,4 @@
 using LibrarySystem.API.ExceptionHandler;
-using LibrarySystem.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using LibrarySystem.Application;
 using LibrarySystem.Infrastructure;
 
@@ -9,10 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 //builder.Services.AddDbContext<LibrarySystemDbContext>(o => o.UseInMemoryDatabase("LibrarySystemDb"));
-
-var connectionString = builder.Configuration.GetConnectionString("LibrarySystemCs");
-
-builder.Services.AddDbContext<LibrarySystemDbContext>(o => o.UseSqlServer(connectionString));
 
 builder.Services
     .AddApplication()
