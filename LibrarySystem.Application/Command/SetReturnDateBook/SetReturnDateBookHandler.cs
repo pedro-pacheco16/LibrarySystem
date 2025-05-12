@@ -1,27 +1,35 @@
 ﻿using LibrarySystem.Application.Command.SetReturnDateBook;
 using LibrarySystem.Application.Models;
-using LibrarySystem.Infrastructure.Persistence;
+using LibrarySystem.Core.Repositories;
+using LibrarySystem.Infrastructure.Repositories;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 public class SetReturnDateBookHandler : IRequestHandler<SetReturnDateBookCommand, ResultViewModel>
 {
-    private readonly LibrarySystemDbContext _context;
+    private readonly ILoanRepository _repository;
 
-    public SetReturnDateBookHandler(LibrarySystemDbContext context)
+    public SetReturnDateBookHandler(ILoanRepository repository)
     {
-        _context = context;
+        _repository = repository;
     }
     public async Task<ResultViewModel> Handle(SetReturnDateBookCommand request, CancellationToken cancellationToken)
     {
-        var loan = await _context.Loans
-            .SingleOrDefaultAsync(l => l.Id == request.Id && l.ReturnedAt == null);
+        var loan = await _repository.GetActiveLoanByIdAsync(request.Id);
 
         if (loan is null)
-            return ResultViewModel.Error("Empréstimo não encontrado ou devolvido.");
+            return ResultViewModel.Error("Empréstimo não encontrado ou já devolvido.");
 
-        loan.SetReturnDate(request.ReturnDate);
-        await _context.SaveChangesAsync();
+        var loanDate = loan.LoanDate;
+
+        if (request.ReturnDate < loanDate)
+            return ResultViewModel.Error("A data de devolução não pode ser anterior à data do empréstimo.");
+
+        var maxReturnDate = loan.LoanDate.AddMonths(3);
+
+        if (request.ReturnDate > maxReturnDate)
+            return ResultViewModel.Error("A data de devolução deve ser no máximo 3 meses após a data do empréstimo.");
+
+        await _repository.SetReturnLoan(loan, request.ReturnDate);
 
         return ResultViewModel.Success();
     }

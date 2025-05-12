@@ -20,6 +20,14 @@ public class CreateLoanHandler : IRequestHandler<CreateLoanCommand, ResultViewMo
         {
             return ResultViewModel<int>.Error("Livro Indisponível no momento");
         }
+
+        var userExists = await _repository.UserExists(request.IdUser);
+
+        if (!userExists)
+        {
+            return ResultViewModel<int>.Error("Usuário não encontrado ou não existe.");
+        }
+
         var loan = request.ToEntity();
 
         var book = await _repository.GetAvailableBookAsync(request.IdBook);

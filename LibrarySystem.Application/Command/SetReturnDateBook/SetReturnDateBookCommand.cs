@@ -14,5 +14,6 @@ namespace LibrarySystem.Application.Command.SetReturnDateBook
         public int Id { get; set; }
 
         public DateTime ReturnDate {  get; set; }
+
     }
 }

@@ -53,15 +53,27 @@ namespace LibrarySystem.Infrastructure.Repositories
 
         public async Task<bool> LoanExists(int id)
         {
-           return await _context.Loans
-                .AnyAsync(l => l.IdBook == id && l.ReturnedAt == null);
+            return await _context.Loans
+                 .AnyAsync(l => l.IdBook == id && l.ReturnedAt == null);
+        }
+
+        public async Task<Loan?> GetActiveLoanByIdAsync(int id)
+        {
+            return await _context.Loans
+                .SingleOrDefaultAsync(l => l.Id == id && l.ReturnedAt == null);
+        }
+
+        public async Task<bool> UserExists(int Id)
+        {
+            return await _context.Users
+                .AnyAsync(u => u.Id == Id);
         }
 
         public async Task ReturnBook(int id, DateTime returBook)
         {
             var loan = await _context.Loans
                .Include(l => l.Book)
-               .SingleOrDefaultAsync(l => l.Id == id); 
+               .SingleOrDefaultAsync(l => l.Id == id);
 
             if (loan == null || loan.ReturnedAt.HasValue)
                 throw new InvalidOperationException("Empréstimo inválido ou já devolvido.");
@@ -71,9 +83,13 @@ namespace LibrarySystem.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public Task SetReturnLoan(int id, DateTime? loanDate)
+        public async Task SetReturnLoan(Loan loan, DateTime? loanDate)
         {
-            throw new NotImplementedException();
+            var effectiveReturnDate = loanDate ?? loan.LoanDate.AddMonths(3);
+
+            loan.SetReturnDate(effectiveReturnDate);
+            await _context.SaveChangesAsync();
+
         }
     }
 }

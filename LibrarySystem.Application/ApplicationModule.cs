@@ -1,4 +1,7 @@
-﻿using LibrarySystem.Application.Command.CreateBook;
+﻿using FluentValidation;
+using FluentValidation.AspNetCore;
+using LibrarySystem.Application.Command.CreateBook;
+using LibrarySystem.Application.Validators;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LibrarySystem.Application
@@ -8,7 +11,8 @@ namespace LibrarySystem.Application
         public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services
-                .AddHandlers();
+                .AddHandlers()
+                .AddValidator();
 
             return services;
         }
@@ -16,6 +20,15 @@ namespace LibrarySystem.Application
         {
             services.AddMediatR(config =>
             config.RegisterServicesFromAssemblyContaining<CreateBookCommand>());
+
+            return services;
+        }
+
+        public static IServiceCollection AddValidator(this IServiceCollection services)
+        {
+            services
+                .AddFluentValidationAutoValidation()
+                .AddValidatorsFromAssemblyContaining<CreateBookValidator>();
 
             return services;
         }
